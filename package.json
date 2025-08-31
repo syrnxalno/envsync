@@ -1,0 +1,10 @@
+{
+  "name": "envsync",
+  "dependencies": {
+    "commander": "^14.0.0"
+  },
+  "type": "module",
+  "bin": {
+    "envsync": "./src/cli.js"
+  }
+}
