@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { Command } from 'commander';
+import fs from 'fs'
 
 const program = new Command();
 
@@ -17,13 +18,40 @@ program
     .option('-s, --source <path>', 'Specify the source of the env file (default: remote)')
     .action((options) => {
         console.log('Running envsync pull...');
-        if (options.force) {
-            console.log('Force mode enabled: local .env will be overwritten.');
+        // Step 1: Check if .env.example exists in local file system (for now)
+        if (!fs.existsSync('.env.example')) {
+            console.error('No \'.env.example\' found in this project. Create a template to get started');
+            process.exit(1);
         }
-        if (options.source) {
-            console.log(`Using source: ${options.source}`);
+
+        // Step 2: Load variables from .env.example
+        const exampleContent = fs.readFileSync('.env.example', 'utf8');
+        const exampleVars = dotenv.parse(exampleContent);
+
+        // Step 3: If .env does not exist OR --force is passed → create/overwrite it
+        if (!fs.existsSync('.env') || options.force) {
+            fs.writeFileSync('.env', exampleContent, 'utf8');
+            console.log(options.force 
+                ? 'Overwrote existing .env with .env.example'
+                : 'Created new .env from .env.example'
+            );
+            return;
         }
-        // link a script or some action here
+
+        // Step 4: If .env exists → compare and warn about missing keys
+        const envContent = fs.readFileSync('.env', 'utf8');
+        const envVars = dotenv.parse(envContent);
+
+        const missingKeys = Object.keys(exampleVars).filter(
+            (key) => !(key in envVars)
+        );
+
+        if (missingKeys.length > 0) {
+            console.log('Your .env is missing the following keys:');
+            missingKeys.forEach((k) => console.log(`   - ${k}`));
+        } else {
+            console.log('Your .env already contains all keys from .env.example');
+        }
     });
 
 // `push` command to upload local env vars to the source
