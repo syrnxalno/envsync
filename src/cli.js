@@ -31,7 +31,7 @@ program
         // Step 3: If .env does not exist OR --force is passed → create/overwrite it
         if (!fs.existsSync('.env') || options.force) {
             fs.writeFileSync('.env', exampleContent, 'utf8');
-            console.log(options.force 
+            console.log(options.force
                 ? 'Overwrote existing .env with .env.example'
                 : 'Created new .env from .env.example'
             );
@@ -54,17 +54,34 @@ program
         }
     });
 
-// `push` command to upload local env vars to the source
+// `push` command (basic template)
 program
     .command('push')
     .description('Push your local .env to the source')
     .option('-b, --backup', 'Create a backup before pushing')
+    .option('-s, --source <path>', 'Specify the destination of the env file (default: remote)')
     .action((options) => {
         console.log('Running envsync push...');
-        if (options.backup) {
-            console.log('Backup enabled: saving current remote env before pushing.');
+
+        // Step 1: Ensure .env exists
+        if (!fs.existsSync('.env')) {
+            console.error('No .env file found to push.');
+            process.exit(1);
         }
-        // link a script or some action here
+
+        const envContent = fs.readFileSync('.env', 'utf8');
+
+        // Step 2: Handle backup option
+        if (options.backup) {
+            const backupPath = `.env.backup.${Date.now()}`;
+            fs.writeFileSync(backupPath, envContent, 'utf8');
+            console.log(`Backup created at ${backupPath}`);
+        }
+
+        // Step 3: "Push" to source (for now, just write to a file or simulate remote)
+        const dest = options.source || 'remote.env';
+        fs.writeFileSync(dest, envContent, 'utf8');
+        console.log(`.env successfully pushed to ${dest}`);
     });
 
 // Display help if no arguments are passed
