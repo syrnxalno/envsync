@@ -1,3 +1,4 @@
+## ```envsync``` - a lightweight environment variable handler <br>
 Clone the repository and install dependencies:
 ```bash
 git clone https://github.com/syrnxalno/envsync.git
