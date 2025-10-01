@@ -1,4 +1,5 @@
 ## ```envsync``` - a lightweight environment variable handler <br>
+![wip](https://img.shields.io/badge/status-WIP-blueviolet) <br><br>
 Clone the repository and install dependencies:
 ```bash
 git clone https://github.com/syrnxalno/envsync.git
